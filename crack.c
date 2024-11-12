@@ -26,16 +26,30 @@ char * tryWord(char * plaintext, char * hashFilename)
         exit(1);
     }
 
+    // 
     char line[HASH_LEN];
+
     // Loop through the hash file, one line at a time.
-    while(fgets(line, 255, inFile) != NULL)
+    while(fgets(line, sizeof(line), inFile) != NULL)
     {
+        // remove the new line character
+        line[strcspn(line, "\n")] = 0;
+
         // Attempt to match the hash from the file to the
         // hash of the plaintext.
-        if (strcmp(hashed_plaintext,line) != 0)
+        if (strcmp(hashed_plaintext,line) == 0)
+        {
             // If there is a match, you'll return the hash.
+
+            // Create a var to hold the line that we're going to return
+            // malloc the memory space for it
+            char *wanted = malloc(strlen(line) + 1);
+            // Copy over the string from line to wanted
+            strcpy(wanted, line);
             fclose(inFile);
-            return hashed_plaintext;
+            free(hashed_plaintext);
+            return wanted;
+        }
     }
 
     // Before returning, do any needed cleanup:
@@ -105,4 +119,3 @@ int main(int argc, char *argv[])
     printf("%d hashes cracked!\n", count);
     // Free up any malloc'd memory?
 }
-
